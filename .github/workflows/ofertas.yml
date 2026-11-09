@@ -2,13 +2,11 @@ name: Generar Excel ofertas Burgos
 
 on:
   schedule:
-    # Varios intentos cada madrugada por si GitHub se salta alguno.
-    # (02:17-05:17 UTC = 03:17-07:17 hora de Burgos). Si el Excel de hoy ya
+    # Varios intentos cada madrugada por si GitHub se salta alguno:
+    # cada media hora, a los minutos 17 y 47, de 02:17 a 06:47 UTC
+    # (= 03:17 a 07:47 hora de Burgos en invierno). Si el Excel de hoy ya
     # está hecho, los siguientes intentos no hacen nada.
-    - cron: "17 2 * * *"
-    - cron: "17 3 * * *"
-    - cron: "17 4 * * *"
-    - cron: "17 5 * * *"
+    - cron: "17,47 2-6 * * *"
   workflow_dispatch:
   push:
     paths:
