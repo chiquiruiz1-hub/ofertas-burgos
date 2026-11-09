@@ -8,6 +8,7 @@ Sustituye al proceso manual del Excel con macros (Ofertas_Sepe_Auto.xlsm):
 """
 import html
 import json
+import os
 import re
 import sys
 import time
@@ -108,7 +109,23 @@ def construir(registros, hoy=None):
     return wb, len(filas)
 
 
+def ya_esta_al_dia():
+    """True si Burgos_Ofertas.xlsx ya se generó hoy (fecha en B2, hora de Madrid)."""
+    try:
+        from openpyxl import load_workbook
+
+        hoy = datetime.now(ZoneInfo("Europe/Madrid")).strftime("%d-%m-%Y")
+        return load_workbook(SALIDA).active["B2"].value == hoy
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def main():
+    # En las ejecuciones programadas (hay varias cada madrugada por si GitHub
+    # se salta alguna), si el Excel de hoy ya existe no se repite el trabajo.
+    if os.environ.get("GITHUB_EVENT_NAME") == "schedule" and ya_esta_al_dia():
+        print("El Excel de hoy ya estaba hecho: no se repite.")
+        return
     if len(sys.argv) > 1:  # modo prueba: python generar_excel.py datos.json
         with open(sys.argv[1], encoding="utf-8") as f:
             registros = json.load(f)
